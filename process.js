@@ -1,85 +1,39 @@
-var isPlaying = true;
-var isCreating = false;
-var turn = -1;
-var isPvp = false;
-var maxX = 3;
-var maxY = 3;
-var maxZ = 3;
-var array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+maxX = 3;
+maxY = 3;
+maxZ = 3;
+array = [];
+maxDeep = 4;
+isUseAlpha = false;
+
+function isMoveLeft(){
+    for(var i = 0; i < maxX; i++) {
+        for (var j = 0; j < maxY; j++) {
+            for (var f = 0; f < maxZ; f++) {
+                if(array[index(i,j,f)] == 0) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
 function index(x, y, z){
     return x * maxX * maxY + y * maxY + z;
 }
 
-function drawX(ctx){
-    var pl = document.getElementById("ic_x");
+this.addEventListener('message', function (e) {
 
-    ctx.drawImage(pl, 50, -20, 180, 200);
-}
+    //console.log("e2=",e.data);
 
-function drawO(ctx){
-    var pl = document.getElementById("ic_o");
+    array=e.data[0];
+    isUseAlpha = e.data[1];
 
-    ctx.drawImage(pl, 25, 25, 200, 120);
-}
+    var d = BestMove()
 
-function onCreateBoardClicked() {
-    isCreating = !isCreating;
-}
-
-function onPvPClicked() {
-    isPvp = !isPvp;
-}
-
-function comPlay(x, y, z) {
-    if (isPlaying) {
-        var id = String(x) + String(y) + String(z);
-
-        var box = document.getElementById(id);
-
-        drawO(box.getContext("2d"));
-
-        array[index(x, y, z)] = turn;
-
-        if (CheckState(1) == 1) {
-            console.log("May thang");
-            isPlaying = false;
-        }
-
-        turn = -turn;
-    }
-}
-
-function onBoxClicked(x, y, z, box) {
-    if (isPlaying) {
-        var ctx = box.getContext("2d")
-
-        if (turn == -1) {
-            drawX(ctx);
-        } else {
-            drawO(ctx);
-        }
-    
-        console.log("Clicked", x, y, z);
-    
-        array[index(x, y, z)] = turn;
-        
-        if (!isCreating) {
-            if (CheckState(turn) == 1) {
-                console.log("Nguoi thang");
-                isPlaying = false;
-            }
-        }
-        
-        turn = -turn;
-        
-        if (isPlaying && !isCreating) {
-            if (!isPvp) {
-                BestMove();
-            }
-        }
-    }
-}
+    this.postMessage(d);
+}, false);
 
 function CheckState(player){
     var move = 0;
@@ -100,12 +54,12 @@ function CheckState(player){
     for (var i = 0; i < maxX; i++) {
         for (var j = 0; j < maxY; j++){
             var count = 0;
-
             for (var f = 0; f < maxZ; f++) {
                 count += array[index(i, j, f)];
             }
 
             if (count == player * 3) {
+                ////drawWinWay([i, i, i], [j, j, j], [0, 1, 2]);
                 return 1;
             }
         }
@@ -119,6 +73,7 @@ function CheckState(player){
             }
 
             if (count == player * 3) {
+                ////drawWinWay([i, i, i], [0, 1, 2], [f, f, f]);
                 return 1;
             }
         }
@@ -132,6 +87,7 @@ function CheckState(player){
             }
 
             if (count == player * 3) {
+                ////drawWinWay([0, 1, 2], [j, j, j], [f, f, f]);
                 return 1;
             }
         }
@@ -141,6 +97,7 @@ function CheckState(player){
     for (var i = 0; i < maxX; i++){
         var count = array[index(i, 0, 0)] + array[index(i, 1, 1)] + array[index(i, 2, 2)];
         if (count == player * 3){
+            ////drawWinWay([i, i, i], [0, 1, 2], [0, 1, 2]);
             return 1;
         }
     }
@@ -148,6 +105,7 @@ function CheckState(player){
     for (var i = 0; i < maxX; i++){
         var count = array[index(i, 2, 0)] + array[index(i, 1, 1)] + array[index(i, 0, 2)];
         if (count == player * 3){
+            ////drawWinWay([i, i, i], [2, 1, 0], [0, 1, 2]);
             return 1;
         }
     }
@@ -155,12 +113,14 @@ function CheckState(player){
     for (var j = 0; j < maxY; j++){
         var count = array[index(0, j, 0)] + array[index(1, j, 1)] + array[index(2, j, 2)];
         if (count == player * 3){
+            ////drawWinWay([0, 1, 2], [j, j, j], [0, 1, 2]);
             return 1;
         }
     }
     for (var j = 0; j < maxY; j++){
         var count = array[index(2, j, 0)] + array[index(1, j, 1)] + array[index(0, j, 2)];
         if (count == player * 3){
+            ////drawWinWay([2, 1, 0], [j, j, j], [0, 1, 2]);
             return 1;
         }
     }
@@ -168,34 +128,40 @@ function CheckState(player){
     for (var f = 0; f < maxZ; f++){
         var count = array[index(0, 0, f)] + array[index(1, 1, f)] + array[index(2, 2, f)];
         if (count == player * 3){
+            ////drawWinWay([0, 1, 2], [0, 1, 2], [f, f, f]);
             return 1;
         }
     }
     for (var f = 0; f < maxZ; f++){
         var count = array[index(2, 0, f)] + array[index(1, 1, f)] + array[index(0, 2, f)];
         if (count == player * 3){
+            //drawWinWay([2, 1, 0], [0, 1, 2], [f, f, f]);
             return 1;
         }
     }
 
     var count = array[index(0, 0, 0)] + array[index(1, 1, 1)] + array[index(2, 2, 2)];
     if (count == player * 3){
+        //drawWinWay([0, 1, 2], [0, 1, 2], [0, 1, 2]);
         return 1;
     }
     count = array[index(0, 0, 2)] + array[index(1, 1, 1)] + array[index(2, 2, 0)];
     if (count == player * 3){
+        //drawWinWay([0, 1, 2], [0, 1, 2], [2, 1, 0]);
         return 1;
     }
     count = array[index(0, 2, 0)] + array[index(1, 1, 1)] + array[index(2, 0, 2)];
     if (count == player * 3){
+        //drawWinWay([0, 1, 2], [2, 1, 0], [0, 1, 2]);
         return 1;
     }
     count = array[index(0, 2, 2)] + array[index(1, 1, 1)] + array[index(2, 0, 0)];
     if (count == player * 3){
+        //drawWinWay([0, 1, 2], [2, 1, 0], [2, 1, 0]);
         return 1;
     }
 
-    return 0;
+    return -1;
 }
 
 function BestMove(){
@@ -207,7 +173,6 @@ function BestMove(){
         for (var j = 0; j < maxY; j++) {
             var isBreakJ = 0;
             for (var f = 0; f < maxZ; f++) {
-                
                 if (array[index(i, j, f)] == 0) {
                     if (ar[0] == -1) {
                         ar = [i, j, f];
@@ -222,6 +187,8 @@ function BestMove(){
                     }
                     var wayval = MiniMax(-1, 0, [-999, 999]);
                     
+                    console.log("ditim", i, j, f, wayval);
+
                     if (wayval >= max){
                         max = wayval;
                         ar = [i, j, f];
@@ -245,36 +212,41 @@ function BestMove(){
     console.log("Best move", ar);
     console.log(max);
 
-    comPlay(ar[0], ar[1], ar[2]);
+    console.log("pos = ", ar[0], ar[1], ar[2]);
+
+    return [ar[0], ar[1], ar[2]];
 }
 
 function MiniMax(player, count, alphBet){
-    //console.log("check ", CheckState(player), player);
     if (CheckState(-player) == 1 && -player == 1) {
-        //console.log("aaaaaaaaaaaaaaaa");
-        return 999;
+        return 50 - count;
     } else if (CheckState(-player) == 1 && -player == -1) {
-        //console.log("eeeeeeeeeeeeeeee");
-        return -999;
+        return -50 + count;
     }
 
-    if (count >= 1){
+    if (!isMoveLeft()) {
+        return 0;
+    }
+
+    if (count >= maxDeep){
         var a = CountWin(1)
         var b = CountWin(-1);
-        //console.log("ab",a, b);
-        return a - b;
-        //return CountWin(player);
+        return a - b - count;
     }
 
     if (player == 1) {      //max
         var best = -9999;
         for (var i = 0; i < maxX; i++) {
+            var isBreakI = false;
             for (var j = 0; j < maxY; j++) {
+                var isBreakJ = false;
                 for (var f = 0; f < maxZ; f++) {
                     if (array[index(i, j, f)] == 0) {
                         array[index(i, j, f)] = player;
 
                         var cur = MiniMax(-player, count + 1, alphBet);
+
+                        //console.log("max",i, j, f, cur, best);
                         
                         if (cur >= best) {
                             best = cur;
@@ -283,15 +255,26 @@ function MiniMax(player, count, alphBet){
                         if (best >= alphBet[0]) {
                             alphBet[0] = best;
                         }
-
-                        if (alphBet[0] >= alphBet[1]) {
-                            array[index(i, j, f)] = 0;
-                            break;
+                        
+                        if (isUseAlpha) {
+                            if (alphBet[0] >= alphBet[1]) {
+                                array[index(i, j, f)] = 0;
+                                //console.log("cut max", i, j, f);
+                                //isBreakJ = true;
+                                break;
+                            }
                         }
 
                         array[index(i, j, f)] = 0;
                     }
                 }
+                if (isBreakJ) {
+                    isBreakI = true;
+                    break;
+                }
+            }
+            if (isBreakI) {
+                break;
             }
         }
 
@@ -300,12 +283,17 @@ function MiniMax(player, count, alphBet){
     else {      //min
         var best = 9999;
         for (var i = 0; i < maxX; i++) {
+            var isBreakI = false;
             for (var j = 0; j < maxY; j++) {
+                var isBreakJ = false;
                 for (var f = 0; f < maxZ; f++) {
                     if (array[index(i, j, f)] == 0) {
                         array[index(i, j, f)] = player;
 
                         var cur = MiniMax(-player, count + 1, alphBet);
+
+                        //console.log("min",i, j, f, cur, best);
+
                         if (cur <= best) {
                             best = cur;
                         }
@@ -314,14 +302,25 @@ function MiniMax(player, count, alphBet){
                             alphBet[1] = best;
                         }
 
-                        if (alphBet[0] >= alphBet[1]) {
-                            array[index(i, j, f)] = 0;
-                            break;
+                        if (isUseAlpha){
+                            if (alphBet[0] >= alphBet[1]) {
+                                array[index(i, j, f)] = 0;
+                                //console.log("cut min", i, j, f);
+                                //isBreakJ = true;
+                                break;
+                            }
                         }
 
                         array[index(i, j, f)] = 0;
                     }
                 }
+                if (isBreakJ) {
+                    isBreakI = true;
+                    break;
+                }
+            }
+            if (isBreakI) {
+                break;
             }
         }
 

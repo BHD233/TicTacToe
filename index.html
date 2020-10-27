@@ -3,9 +3,13 @@
 <head>
 <style>
 div {
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
   background-color: white;
+}
+
+h2 {
+    cursor: pointer;
 }
 
 table {
@@ -15,17 +19,22 @@ table {
 #myDiv1 {
     position: absolute;
     top: 0%;
+    margin-left: -100px;
     cursor: pointer;
     transform: rotateX(70deg) rotateY(-10deg) rotateZ(25deg) translateX(50px);
     transition: 0.25s all ease;
     z-index: -1;
     box-shadow: 0px 10px 40px 20px #888888;
 }
+#myDiv1:hover{
+    top: 7%
+}
 
 
 #myDiv2 {
     position: absolute;
     top: 35%;
+    margin-left: -100px;
     cursor: pointer;
     transform: rotateX(70deg) rotateY(-10deg) rotateZ(25deg) translateX(50px);
     z-index: -2;
@@ -33,13 +42,14 @@ table {
     box-shadow: 0px 10px 40px 20px #888888;
 }
 #myDiv2:hover{
-    top: 40%
+    top: 42%
 }
 
 #myDiv3 {
     position: absolute;
     left: 0%;
     top: 70%;
+    margin-left: -100px;
     cursor: pointer;
     transform: rotateX(70deg) rotateY(-10deg) rotateZ(25deg) translateX(50px);
     z-index: -3;
@@ -47,16 +57,85 @@ table {
     box-shadow: 0px 10px 40px 20px #888888;
 }
 #myDiv3:hover{
-    top: 75%
+    top: 77%
 }
 
-#wrapper {
+#main_game {
   position: absolute;
-  top: 30%;
-  left: 40%;
+  top: 20%;
+  left: 50%;
   width: 400px;
-  height: 300px;
+  height: 400px;
+  margin-left: -100px;
   z-index: -1;
+}
+
+
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 30px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
 }
 
 </style>
@@ -65,11 +144,27 @@ table {
 <body>
     <h1 style="text-align: center; font-size: 30px;">Tic tac toe</h1>
     <h1 style="text-align: center; font-size: 30px;">By Bui Huu Duc - 18120320</h1>
+    <h2 id="back_button" onclick="onBackButtonClicked()" style="position: relative; text-align: start; font-size: 30px; left: 20px; display: none;">Back</h1>
     <img id="ic_x" src="./ic_x.png" style="display: none;"/>
 
     <img id="ic_o" src="./ic_o.png" style="display: none;"/>
 
-    <div id="wrapper">
+    <div id="main_menu" style="position: absolute; top: 30%; left: 40%;">
+        <h2 style="text-align: center; font-size: 30px;" onclick="onPlayComClick()">Play with computer</h1>
+        <h2 style="text-align: center; font-size: 30px;" onclick="onPvPClicked()">PvP</h1> 
+        <h2 style="text-align: center; font-size: 30px;" onclick="onCreateBoardClicked()">Create Board</h1> 
+        <div style="position: relative; left: 15%;">
+            <label class="container">
+                <h2 style="font-size: 30px;">Use Alpha-Beta-Cut</h1>
+                <input type="checkbox" onclick="onAlphaBetClicked()">
+                <span class="checkmark"></span>
+              </label>
+        </div>
+    </div>
+    <div id="cover" style="height: 600px;">
+    </div>
+    <div id="main_game" style="display: none;">
+
         <div id="myDiv1">
             <table style="width: 100%; height: 100%;">
                 <tr style="background-color: darkorange;">
@@ -111,10 +206,9 @@ table {
             </table>
         </div>
         
-        
         <div id="myDiv2">
             <table style="width: 100%; height: 100%;">
-                <tr style="background-color: red;">
+                <tr style="background-color: darkorange;">
                     <th>
                         <canvas id="100"  style="height: 90px; width: 90px;" onclick="onBoxClicked(1, 0, 0, this)"></canvas>
                     </th>
@@ -126,7 +220,7 @@ table {
                     </th>
                 </tr>
         
-                <tr style="background-color: red;">
+                <tr style="background-color: darkorange;">
                     <th>
                         <canvas id="110"  style="height: 90px; width: 90px;" onclick="onBoxClicked(1, 1, 0, this)"></canvas>
                     </th>
@@ -138,7 +232,7 @@ table {
                     </th>
                 </tr>
         
-                <tr style="background-color: red;">
+                <tr style="background-color: darkorange;">
                     <th>
                         <canvas id="120"  style="height: 90px; width: 90px;" onclick="onBoxClicked(1, 2, 0, this)"></canvas>
                     </th>
@@ -153,10 +247,9 @@ table {
             </table>
         </div>
         
-        
         <div id="myDiv3">
             <table style="width: 100%; height: 100%;">
-                <tr style="background-color: green;">
+                <tr style="background-color: darkorange;">
                     <th>
                         <canvas id="200"  style="height: 90px; width: 90px;" onclick="onBoxClicked(2, 0, 0, this)"></canvas>
                     </th>
@@ -168,7 +261,7 @@ table {
                     </th>
                 </tr>
         
-                <tr style="background-color: green;">
+                <tr style="background-color: darkorange;">
                     <th>
                         <canvas id="210"  style="height: 90px; width: 90px;" onclick="onBoxClicked(2, 1, 0, this)"></canvas>
                     </th>
@@ -180,7 +273,7 @@ table {
                     </th>
                 </tr>
         
-                <tr style="background-color: green;">
+                <tr style="background-color: darkorange;">
                     <th>
                         <canvas id="220" style="height: 90px; width: 90px;" onclick="onBoxClicked(2, 2, 0, this)"></canvas>
                     </th>
@@ -194,28 +287,15 @@ table {
         
             </table>
         </div>
+
+        
+        <h2 id="start_button" onclick="onStartButtonClicked()" style="position: relative; left: 10%; top: 150%;">Start</h1>
     </div>
 
-    <div style="width: auto;height: auto;">
-        <div style="height: auto;">
-            <label onclick="onPvPClicked()">
-                <input type="checkbox">
 
-            </label>
-            <b>PvP</b>
-        </div>
-
-        <div style="height: auto; margin-top: 20px;">
-            <label>
-                <input type="checkbox" onclick="onCreateBoardClicked()">
-
-            </label>
-            <b>Create board</b>
-        </div>
-
-    </div>
+    <h1 id="turn_title" style="text-align: center;""></h1>
     
-    <script src="./process.js"></script>
+    <script src="./index.js"></script>
     
 
 </body>
