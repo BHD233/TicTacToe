@@ -15,6 +15,7 @@ var mainMenu = document.getElementById("main_menu");
 var mainGame = document.getElementById("main_game");
 var backButton = document.getElementById("back_button");
 var turnTilte = document.getElementById("turn_title");
+var startButton = document.getElementById("start_button");
 
 
 
@@ -23,7 +24,6 @@ function ResetValue(){
     isPlaying = false;
     isCreating = false;
     isFinding = false;
-    isUseAlpha = false;
     turn = -1;
     isPvp = false;
     maxX = 3;
@@ -31,7 +31,20 @@ function ResetValue(){
     maxZ = 3;
     array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    turnTilte.style.display = "none";
+    for (var i = 0; i < maxX; i++) {
+        for (var j = 0; j < maxY; j++) {
+            for (var f = 0; f < maxZ; f++) {
+                var box = document.getElementById(i.toString() + j.toString() + f.toString());
+
+                box.getContext("2d").clearRect(0,0,300,300);
+                
+                box.style.backgroundColor = "darkorange"; 
+                //console.log("cleae");
+            }
+        }
+    }
+
+    turnTilte.innerHTML = "";
 
 }
 
@@ -44,22 +57,26 @@ function onStartButtonClicked(){
 
     //hide the cover
     document.getElementById("cover").style.display="none";
+
+    sendTurn();
 }
 
 function sendTurn(){
     if (!isCreating) {
+        console.log("send");
+
         var tilte = document.getElementById("turn_title");
         if (turn == 1) {
             if (!isPvp) {
                 tilte.innerHTML = "CPU's Turn";
             } else {
-                tilte.innerHTML = "Player 1's Turn";
+                tilte.innerHTML = "Player 2's Turn";
             }
         } else if (turn == -1) {
             if (!isPvp) {
                 tilte.innerHTML = "Your Turn";
             } else {
-                tilte.innerHTML = "Player 2's Turn";
+                tilte.innerHTML = "Player 1's Turn";
             }
         }
     }
@@ -73,13 +90,13 @@ function sendWin(state){
             if (!isPvp) {
                 turnTilte.innerHTML = "CPU win";
             } else {
-                turnTilte.innerHTML = "Player 1 win";
+                turnTilte.innerHTML = "Player 2 win";
             }
         } else {
             if (!isPvp) {
                 turnTilte.innerHTML = "You win";
             } else {
-                turnTilte.innerHTML = "Player 2 win";
+                turnTilte.innerHTML = "Player 1 win";
             }
         }
     }
@@ -134,7 +151,13 @@ function ShowMainMenu(){
 function ShowMainGame(){
     mainMenu.style.display = "none";
     mainGame.style.display = "block";
-    backButton.style.display = "inline-block";
+    backButton.style.display = "block";
+    startButton.style.display = "inline-block";
+    if (!isCreating) {
+        document.getElementById("cover").style.display="block";
+    } else {
+        document.getElementById("cover").style.display="none";
+    }
 }
 
 function comPlay(x, y, z) {
@@ -171,7 +194,7 @@ worker.addEventListener('message', function (e) {
 function onBoxClicked(x, y, z, box) {
 
     //check valid 
-    if (array[index(x, y, z)] != 0) {
+    if (array[index(x, y, z)] != 0 || (turn == 1 && !isCreating && !isPvp)) {
         return;
     }
     if (isPlaying || isCreating) {
@@ -205,8 +228,6 @@ function onBoxClicked(x, y, z, box) {
         if (!isPvp) {
             isFinding = true;
             //BestMove();
-            
-            console.log("haha= ", array);
             worker.postMessage([array, isUseAlpha]);
             isFinding = false;
         }
