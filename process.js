@@ -218,10 +218,10 @@ function BestMove(){
 }
 
 function MiniMax(player, count, alphBet){
-    if (CheckState(-player) == 1 && -player == 1) {
-        return 50 - count;
-    } else if (CheckState(-player) == 1 && -player == -1) {
-        return -50 + count;
+    if (CheckState(player) == 1 && player == 1) {
+        return 999 - count;
+    } else if (CheckState(player) == 1 && player == -1) {
+        return -999 + count;
     }
 
     if (!isMoveLeft()) {
@@ -278,7 +278,7 @@ function MiniMax(player, count, alphBet){
             }
         }
 
-        return best;
+        return best - count;
     }
     else {      //min
         var best = 9999;
@@ -324,7 +324,7 @@ function MiniMax(player, count, alphBet){
             }
         }
 
-        return best;
+        return best - count;
     }
 
 }
